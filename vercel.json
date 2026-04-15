@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "pages/api/crawl.js": {
+      "maxDuration": 60
+    },
+    "pages/api/ask.js": {
+      "maxDuration": 30
+    }
+  }
+}
