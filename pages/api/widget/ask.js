@@ -1,6 +1,6 @@
-import { getSupabaseAdmin } from '../../../lib/supabase'
-import { applyCors, originAllowed } from '../../../lib/cors'
-import { embedQuery, EMBED_MODEL } from '../../../lib/embeddings'
+import { getSupabaseAdmin } from '../../../lib/supabase.mjs'
+import { applyCors, originAllowed } from '../../../lib/cors.mjs'
+import { embedQuery, EMBED_MODEL } from '../../../lib/embeddings.mjs'
 
 export const config = { maxDuration: 30 }
 

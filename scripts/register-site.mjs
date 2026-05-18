@@ -45,6 +45,31 @@ async function main() {
     console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env.local')
     process.exit(1)
   }
+  if (!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(url)) {
+    console.error('SUPABASE_URL looks malformed:', JSON.stringify(url))
+    console.error('Expected something like https://YOURPROJECT.supabase.co')
+    process.exit(1)
+  }
+  if (key.length < 100 || /\s/.test(key)) {
+    console.error(`SUPABASE_SERVICE_ROLE_KEY looks wrong (length=${key.length}, contains whitespace=${/\s/.test(key)}).`)
+    console.error('Service-role keys are >100 chars and have no spaces/newlines.')
+    console.error('Get it from: Supabase dashboard → Project Settings → API → service_role')
+    process.exit(1)
+  }
+
+  // Sanity ping so we surface the real network error instead of "fetch failed".
+  try {
+    const res = await fetch(url.replace(/\/$/, '') + '/auth/v1/health', { method: 'GET' })
+    if (!res.ok && res.status !== 404) {
+      console.error(`Supabase project responded ${res.status} on health check — URL likely wrong.`)
+      process.exit(1)
+    }
+  } catch (err) {
+    console.error('Could not reach Supabase URL:', err.message)
+    if (err.cause) console.error('  cause:', err.cause.message || err.cause)
+    console.error('  url:', url)
+    process.exit(1)
+  }
 
   const supabase = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -54,20 +79,32 @@ async function main() {
   const allowedOrigins = [...new Set([...expectedOriginsFor(domain), ...args.origins])]
   const siteKey = randomKey()
 
-  const { data, error } = await supabase
-    .from('webask_sites')
-    .insert({
-      site_key: siteKey,
-      domain,
-      label: args.label || domain,
-      allowed_origins: allowedOrigins,
-      status: 'pending',
-    })
-    .select()
-    .single()
+  let data, error
+  try {
+    const result = await supabase
+      .from('webask_sites')
+      .insert({
+        site_key: siteKey,
+        domain,
+        label: args.label || domain,
+        allowed_origins: allowedOrigins,
+        status: 'pending',
+      })
+      .select()
+      .single()
+    data = result.data
+    error = result.error
+  } catch (err) {
+    console.error('Insert threw:', err.message)
+    if (err.cause) console.error('  cause:', err.cause.message || err.cause)
+    process.exit(1)
+  }
 
   if (error) {
     console.error('Failed to register site:', error.message)
+    if (error.details) console.error('  details:', error.details)
+    if (error.hint) console.error('  hint:', error.hint)
+    if (error.code) console.error('  code:', error.code)
     process.exit(1)
   }
 

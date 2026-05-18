@@ -5,8 +5,8 @@ import { config as loadDotenv } from 'dotenv'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createClient } from '@supabase/supabase-js'
-import { crawlPages } from '../lib/crawl.js'
-import { embedDocuments, EMBED_MODEL, EMBED_DIM } from '../lib/embeddings.js'
+import { crawlPages } from '../lib/crawl.mjs'
+import { embedDocuments, EMBED_MODEL, EMBED_DIM } from '../lib/embeddings.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 loadDotenv({ path: resolve(__dirname, '..', '.env.local') })

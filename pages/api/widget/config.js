@@ -1,5 +1,5 @@
-import { getSupabaseAdmin } from '../../../lib/supabase'
-import { applyCors } from '../../../lib/cors'
+import { getSupabaseAdmin } from '../../../lib/supabase.mjs'
+import { applyCors } from '../../../lib/cors.mjs'
 
 // GET /api/widget/config?site_key=sk_...
 // Returns minimal site info the widget needs to decide whether to render and
