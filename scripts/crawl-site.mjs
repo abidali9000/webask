@@ -60,13 +60,13 @@ async function main() {
     updated_at: new Date().toISOString(),
   }).eq('id', site.id)
 
-  let lastLogged = 0
-  const { pages, host } = await crawlPages(`https://${site.domain}/`, {
+  const { pages, host, viaJina } = await crawlPages(`https://${site.domain}/`, {
     maxPages: args.maxPages,
-    onProgress: ({ done, total, kept, skipped }) => {
-      if (done % 25 === 0 || done === total) {
-        console.log(`  [${done}/${total}] kept ${kept}, skipped ${skipped}`)
-        lastLogged = done
+    onProgress: ({ done, total, kept, skipped, viaJina }) => {
+      // Log every page for small crawls, every 25 for larger ones
+      if (total <= 20 || done % 25 === 0 || done === total) {
+        const jinaTag = viaJina ? ` (via jina: ${viaJina})` : ''
+        console.log(`  [${done}/${total}] kept ${kept}, skipped ${skipped}${jinaTag}`)
       }
     },
   })
