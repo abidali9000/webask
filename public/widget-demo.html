@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebAsk widget — local test</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; color: #111827; }
+    h1 { margin: 0 0 16px; font-size: 24px; }
+    p { color: #4b5563; line-height: 1.7; }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>WebAsk widget — local test page</h1>
+  <p>
+    This page is for smoke-testing the widget against a local Next.js dev server.
+    Open it via <code>http://localhost:3000/widget-demo.html</code> (not
+    <code>file://</code>) so the widget script can talk to the API on the same origin.
+  </p>
+  <p>
+    Before this works, you need to:
+  </p>
+  <ol>
+    <li>Run <code>npm run register -- --domain localhost --origin http://localhost:3000</code> to create a site_key for local testing.</li>
+    <li>Run <code>npm run crawl -- &lt;site_key&gt;</code> to populate pages. (For a local-only quick test, you can also crawl any other site you own.)</li>
+    <li>Replace <code>YOUR_SITE_KEY</code> below with the one printed by the register command.</li>
+  </ol>
+  <p>
+    The widget button should appear in the bottom-right corner of this page.
+  </p>
+
+  <script src="/widget.js" data-site-key="YOUR_SITE_KEY" defer></script>
+</body>
+</html>
