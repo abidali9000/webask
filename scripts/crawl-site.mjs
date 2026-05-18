@@ -16,11 +16,12 @@ const EMBED_BATCH_SIZE = 20
 const EMBED_INPUT_CAP = 7000
 
 function parseArgs(argv) {
-  const args = { maxPages: 100 }
+  const args = { maxPages: 100, seedUrls: [] }
   const positional = []
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--max') args.maxPages = parseInt(argv[++i], 10)
+    else if (a === '--url') args.seedUrls.push(argv[++i])
     else if (!a.startsWith('--')) positional.push(a)
   }
   args.siteKey = positional[0]
@@ -62,6 +63,7 @@ async function main() {
 
   const { pages, host, viaJina } = await crawlPages(`https://${site.domain}/`, {
     maxPages: args.maxPages,
+    seedUrls: args.seedUrls,
     onProgress: ({ done, total, kept, skipped, viaJina }) => {
       // Log every page for small crawls, every 25 for larger ones
       if (total <= 20 || done % 25 === 0 || done === total) {
