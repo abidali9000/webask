@@ -57,11 +57,22 @@ async function main() {
     process.exit(1)
   }
 
-  // Sanity ping so we surface the real network error instead of "fetch failed".
+  // Pre-flight check against PostgREST root. With a valid apikey this returns
+  // 200 (OpenAPI schema). 401 = wrong key. Network errors surface as fetch failed.
   try {
-    const res = await fetch(url.replace(/\/$/, '') + '/auth/v1/health', { method: 'GET' })
-    if (!res.ok && res.status !== 404) {
-      console.error(`Supabase project responded ${res.status} on health check — URL likely wrong.`)
+    const res = await fetch(url.replace(/\/$/, '') + '/rest/v1/', {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+    })
+    if (res.status === 401) {
+      console.error('Supabase rejected the key (401). Make sure you copied the')
+      console.error('service_role key (not publishable/anon) from:')
+      console.error('  Supabase dashboard → Project Settings → API Keys → Secret keys')
+      process.exit(1)
+    }
+    if (res.status >= 400 && res.status !== 404) {
+      const body = await res.text().catch(() => '')
+      console.error(`Supabase responded ${res.status} on probe.`)
+      if (body) console.error('  body:', body.slice(0, 200))
       process.exit(1)
     }
   } catch (err) {
